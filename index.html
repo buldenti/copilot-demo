@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Responsive Image Showcase</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #0e0e10;
+        --fg: #f5f5f5;
+        --muted: #c7c7d1;
+        --accent: #5fb3f3;
+        --accent-dark: #2280c3;
+        font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: linear-gradient(160deg, #111, #1c1f2a);
+        color: var(--fg);
+        min-height: 100vh;
+        scroll-behavior: smooth;
+      }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        backdrop-filter: blur(12px);
+        background: rgba(10, 12, 18, 0.9);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      nav {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem clamp(1rem, 4vw, 2rem);
+      }
+
+      nav a.logo {
+        font-size: 1.2rem;
+        text-decoration: none;
+        color: var(--fg);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 1.5rem;
+      }
+
+      .nav-links a {
+        color: var(--muted);
+        text-decoration: none;
+        font-weight: 500;
+        position: relative;
+      }
+
+      .nav-links a::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -0.3rem;
+        width: 100%;
+        height: 2px;
+        background: var(--accent);
+        transform: scaleX(0);
+        transform-origin: right;
+        transition: transform 0.2s ease-out;
+      }
+
+      .nav-links a:focus-visible,
+      .nav-links a:hover {
+        color: var(--fg);
+      }
+
+      .nav-links a:hover::after,
+      .nav-links a:focus-visible::after {
+        transform: scaleX(1);
+        transform-origin: left;
+      }
+
+      main {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: clamp(1rem, 4vw, 2.5rem);
+        display: grid;
+        gap: clamp(3rem, 5vw, 5rem);
+      }
+
+      section {
+        display: grid;
+        gap: 1.5rem;
+      }
+
+      h1 {
+        font-size: clamp(2.5rem, 5vw, 3.5rem);
+        font-weight: 700;
+      }
+
+      h2 {
+        font-size: clamp(1.8rem, 4vw, 2.4rem);
+        font-weight: 600;
+      }
+
+      p {
+        line-height: 1.7;
+        color: var(--muted);
+      }
+
+      .slider {
+        position: relative;
+        border-radius: 20px;
+        overflow: hidden;
+        aspect-ratio: 16 / 9;
+        background: rgba(255, 255, 255, 0.04);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+      }
+
+      .slides {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.7s ease-in-out;
+      }
+
+      .slide {
+        min-width: 100%;
+        height: 100%;
+        position: relative;
+        display: grid;
+        place-items: center;
+      }
+
+      .slide::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.6) 100%);
+        z-index: 1;
+      }
+
+      .slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .slide-caption {
+        position: absolute;
+        z-index: 2;
+        bottom: clamp(1rem, 6vw, 2.8rem);
+        left: clamp(1rem, 6vw, 3rem);
+        right: clamp(1rem, 6vw, 3rem);
+        color: var(--fg);
+      }
+
+      .slide-caption h3 {
+        font-size: clamp(1.6rem, 4vw, 2.4rem);
+        font-weight: 600;
+      }
+
+      .slide-caption p {
+        margin-top: 0.6rem;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .slider-controls {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 clamp(0.4rem, 2vw, 1.5rem);
+        pointer-events: none;
+      }
+
+      .slider-controls button {
+        pointer-events: all;
+        border: none;
+        background: rgba(0, 0, 0, 0.35);
+        color: var(--fg);
+        border-radius: 50%;
+        width: clamp(36px, 6vw, 52px);
+        height: clamp(36px, 6vw, 52px);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        backdrop-filter: blur(4px);
+        transition: transform 0.2s ease, background 0.2s ease;
+      }
+
+      .slider-controls button:focus-visible,
+      .slider-controls button:hover {
+        transform: scale(1.08);
+        background: rgba(0, 0, 0, 0.55);
+      }
+
+      .slider-dots {
+        position: absolute;
+        bottom: clamp(0.8rem, 4vw, 1.6rem);
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 0.7rem;
+        pointer-events: none;
+      }
+
+      .slider-dots button {
+        pointer-events: all;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255, 255, 255, 0.3);
+        transition: transform 0.2s ease, background 0.2s ease, width 0.2s ease;
+        cursor: pointer;
+      }
+
+      .slider-dots button.active {
+        background: var(--accent);
+        transform: scale(1.4);
+      }
+
+      .cta-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 1.2rem;
+      }
+
+      .cta-buttons a {
+        padding: 0.75rem 1.4rem;
+        border-radius: 999px;
+        text-decoration: none;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        backface-visibility: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .cta-buttons a:first-child {
+        background: var(--accent);
+        color: #041020;
+        box-shadow: 0 10px 25px rgba(95, 179, 243, 0.3);
+      }
+
+      .cta-buttons a:last-child {
+        background: transparent;
+        color: var(--fg);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .cta-buttons a:focus-visible,
+      .cta-buttons a:hover {
+        transform: translateY(-2px);
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        padding: clamp(1.4rem, 4vw, 2.2rem);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+      }
+
+      .contact-grid {
+        display: grid;
+        gap: 1.2rem;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      }
+
+      .contact-item {
+        padding: 1rem 1.2rem;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .contact-item strong {
+        display: block;
+        margin-bottom: 0.4rem;
+        color: var(--fg);
+      }
+
+      .contact-item a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      footer {
+        padding: 3rem 0 2rem;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      @media (max-width: 840px) {
+        .nav-links {
+          gap: 1rem;
+          font-size: 0.95rem;
+        }
+
+        .slider {
+          aspect-ratio: 3 / 4;
+        }
+
+        .slide-caption {
+          bottom: 1.8rem;
+        }
+      }
+
+      @media (max-width: 600px) {
+        nav {
+          flex-direction: column;
+          gap: 0.7rem;
+        }
+
+        .nav-links {
+          width: 100%;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+
+        .slider-controls button {
+          background: rgba(0, 0, 0, 0.45);
+        }
+
+        .slide-caption h3 {
+          font-size: 1.5rem;
+        }
+
+        .cta-buttons {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .cta-buttons a {
+          flex: 1;
+          text-align: center;
+          min-width: 140px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a class="logo" href="#home">Nimbus Gallery</a>
+        <div class="nav-links">
+          <a href="#home">Showcase</a>
+          <a href="#about">About</a>
+          <a href="#contact">Contact</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section id="home" aria-label="Image showcase carousel">
+        <h1>Immersive Visual Stories</h1>
+        <p>
+          Our curated collection of imagery highlights the stories behind the lens. Explore landscapes, portraits, and
+          abstract experiments that inspire creativity across every screen size.
+        </p>
+
+        <div class="slider" role="region" aria-roledescription="carousel" aria-live="polite">
+          <div class="slides"></div>
+          <div class="slider-controls" aria-hidden="true">
+            <button class="prev" type="button" aria-label="Previous slide">&#10094;</button>
+            <button class="next" type="button" aria-label="Next slide">&#10095;</button>
+          </div>
+          <div class="slider-dots" role="tablist" aria-label="Slide selection"></div>
+        </div>
+
+        <div class="cta-buttons" aria-label="Quick links">
+          <a href="#about">Learn more</a>
+          <a href="#contact">Work with us</a>
+        </div>
+      </section>
+
+      <section id="about">
+        <div class="card">
+          <h2>About the Gallery</h2>
+          <p>
+            We are a collective of visual storytellers who believe that photography is more than a snapshot—it is a
+            narrative. Our mission is to elevate emerging voices and showcase award-winning perspectives that transport
+            viewers to new places.
+          </p>
+          <p>
+            Every exhibit in Nimbus Gallery pairs a compelling image sequence with behind-the-scenes context, inviting
+            you to engage with each artist’s creative process. From remote expeditions to curated studio sessions, we
+            celebrate projects that challenge our view of the world.
+          </p>
+        </div>
+      </section>
+
+      <section id="contact">
+        <div class="card">
+          <h2>Contact</h2>
+          <p>
+            Ready to collaborate or feature your latest work? Reach out using the options below and our curators will
+            get back within two business days.
+          </p>
+          <div class="contact-grid">
+            <div class="contact-item">
+              <strong>Email</strong>
+              <a href="mailto:hello@nimbusgallery.com">hello@nimbusgallery.com</a>
+            </div>
+            <div class="contact-item">
+              <strong>Studio</strong>
+              <p>
+                347 Aurora Lane
+                <br />
+                San Francisco, CA 94110
+              </p>
+            </div>
+            <div class="contact-item">
+              <strong>Phone</strong>
+              <a href="tel:+14155551234">+1 (415) 555-1234</a>
+            </div>
+            <div class="contact-item">
+              <strong>Social</strong>
+              <a href="https://www.instagram.com" target="_blank" rel="noreferrer">@nimbusgallery</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <small>
+        &copy;
+        <span id="year"></span>
+        Nimbus Gallery. Crafted for dreamers and doers.
+      </small>
+    </footer>
+
+    <script>
+      const slider = document.querySelector(".slider");
+      const slideTrack = slider.querySelector(".slides");
+      const prevButton = slider.querySelector(".prev");
+      const nextButton = slider.querySelector(".next");
+      const dotsContainer = slider.querySelector(".slider-dots");
+      const autoRotateDelay = 6000;
+      let slides = [];
+      let currentIndex = 0;
+      let rotationTimer = null;
+
+      const images = [
+        {
+          src: "img/cyanotype-1.jpg",
+          title: "Cyanotype Bloom",
+          description: "Botanical silhouette preserved in deep cobalt hues.",
+          alt: "Cyanotype print showing layered botanical silhouettes in cobalt blue.",
+        },
+        {
+          src: "img/cyanotype-2.jpg",
+          title: "Tidal Lines",
+          description: "Organic impressions echo the rhythm of receding tides.",
+          alt: "Cyanotype artwork with sweeping white lines resembling shoreline tides.",
+        },
+        {
+          src: "img/cyanotype-3.jpg",
+          title: "Nightshade Study",
+          description: "Delicate leaves overlap to create a sculptural negative space.",
+          alt: "Cyanotype composition of layered nightshade leaves.",
+        },
+        {
+          src: "img/cyanotype-4.jpg",
+          title: "Blueprint Fern",
+          description: "A single fern frond rendered with crisp, architectural detail.",
+          alt: "Cyanotype print highlighting the structure of a fern frond.",
+        },
+        {
+          src: "img/cyanotype-5.jpg",
+          title: "Celestial Petals",
+          description: "Radial petals glow against a midnight gradient backdrop.",
+          alt: "Circular cyanotype of petals forming a starburst pattern.",
+        },
+        {
+          src: "img/cyanotype-6.jpg",
+          title: "Sea Grass Drift",
+          description: "Strands of coastal grasses sway in a slow underwater motion.",
+          alt: "Cyanotype artwork of drifting coastal grasses.",
+        },
+        {
+          src: "img/cyanotype-7.jpg",
+          title: "Botanical Mosaic",
+          description: "Fragments of foliage assemble into a textured collage.",
+          alt: "Cyanotype collage of assorted botanical fragments.",
+        },
+        {
+          src: "img/cyanotype-8.jpg",
+          title: "Indigo Feathers",
+          description: "Feather-like prints reveal intricate barbs and airy detail.",
+          alt: "Cyanotype print resembling layered feathers.",
+        },
+        {
+          src: "img/cyanotype-9.jpg",
+          title: "Sunprint Tangle",
+          description: "Twining stems interlace to create a lively lattice.",
+          alt: "Cyanotype of interwoven stems forming an abstract tangle.",
+        },
+        {
+          src: "img/cyanotype-10.jpg",
+          title: "Cobalt Cascade",
+          description: "Botanical forms cascade diagonally like falling water.",
+          alt: "Cyanotype artwork with cascading botanical silhouettes.",
+        },
+        {
+          src: "img/cyanotype-11.jpg",
+          title: "Pressed Poetry",
+          description: "Paper-thin petals overlap to form a poetic arrangement.",
+          alt: "Cyanotype of pressed petals layered into a soft composition.",
+        },
+        {
+          src: "img/cyanotype-12.jpg",
+          title: "Aurora Fronds",
+          description: "Curved fronds arc like aurora ribbons across the frame.",
+          alt: "Cyanotype print with fronds arc across a deep blue gradient.",
+        },
+        {
+          src: "img/cyanotype-13.jpg",
+          title: "Sapphire Botanica",
+          description: "A dense bouquet celebrates the depth of indigo chemistry.",
+          alt: "Cyanotype bouquet of assorted botanical silhouettes.",
+        },
+      ];
+
+      const buildSlides = () => {
+        images.forEach((image, index) => {
+          const figure = document.createElement("figure");
+          figure.className = "slide";
+          figure.dataset.index = String(index);
+
+          const img = document.createElement("img");
+          img.src = image.src;
+          img.alt = image.alt;
+
+          const caption = document.createElement("figcaption");
+          caption.className = "slide-caption";
+
+          const title = document.createElement("h3");
+          title.textContent = image.title;
+
+          const description = document.createElement("p");
+          description.textContent = image.description;
+
+          caption.append(title, description);
+          figure.append(img, caption);
+          slideTrack.append(figure);
+        });
+
+        slides = Array.from(slideTrack.querySelectorAll(".slide"));
+      };
+
+      const createDots = () => {
+        dotsContainer.innerHTML = "";
+        if (slides.length <= 1) {
+          dotsContainer.setAttribute("hidden", "true");
+          return;
+        }
+        dotsContainer.removeAttribute("hidden");
+        slides.forEach((_, index) => {
+          const dot = document.createElement("button");
+          dot.type = "button";
+          dot.setAttribute("aria-label", `Go to slide ${index + 1}`);
+          dot.setAttribute("role", "tab");
+          dot.dataset.index = String(index);
+          dot.addEventListener("click", () => moveToSlide(index, true));
+          dotsContainer.append(dot);
+        });
+      };
+
+      const updateDots = () => {
+        dotsContainer.querySelectorAll("button").forEach((dot, index) => {
+          dot.classList.toggle("active", index === currentIndex);
+          dot.setAttribute("aria-selected", index === currentIndex);
+        });
+      };
+
+      const moveToSlide = (index, userInitiated = false) => {
+        if (!slides.length) {
+          return;
+        }
+        const normalizedIndex = (index + slides.length) % slides.length;
+        slideTrack.style.transform = `translateX(-${normalizedIndex * 100}%)`;
+        currentIndex = normalizedIndex;
+        updateDots();
+        if (userInitiated) {
+          restartAutoRotate();
+        }
+      };
+
+      const nextSlide = () => moveToSlide(currentIndex + 1);
+      const prevSlide = () => moveToSlide(currentIndex - 1);
+
+      const startAutoRotate = () => {
+        if (slides.length <= 1) {
+          return;
+        }
+        stopAutoRotate();
+        rotationTimer = window.setInterval(nextSlide, autoRotateDelay);
+      };
+
+      const stopAutoRotate = () => {
+        if (rotationTimer) {
+          clearInterval(rotationTimer);
+          rotationTimer = null;
+        }
+      };
+
+      const restartAutoRotate = () => {
+        stopAutoRotate();
+        startAutoRotate();
+      };
+
+      buildSlides();
+      createDots();
+      moveToSlide(0);
+      startAutoRotate();
+
+      nextButton.addEventListener("click", () => moveToSlide(currentIndex + 1, true));
+      prevButton.addEventListener("click", () => moveToSlide(currentIndex - 1, true));
+
+      slider.addEventListener("mouseenter", stopAutoRotate);
+      slider.addEventListener("mouseleave", startAutoRotate);
+      slider.addEventListener("touchstart", stopAutoRotate, { passive: true });
+      slider.addEventListener("touchend", startAutoRotate);
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          stopAutoRotate();
+        } else {
+          startAutoRotate();
+        }
+      });
+
+      window.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowRight") {
+          moveToSlide(currentIndex + 1, true);
+        }
+        if (event.key === "ArrowLeft") {
+          moveToSlide(currentIndex - 1, true);
+        }
+      });
+
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>
